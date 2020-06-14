@@ -1,0 +1,14 @@
+---
+- name: install redis
+  apt:
+    name: redis-server
+    state: present
+    update_cache: yes
+
+- name: update config
+  lineinfile:
+    path: /etc/redis/redis.conf
+    insertafter: '^bind 127.0.0.1'
+    line: 'bind {{ ip_address }}'
+  notify:
+    - redis restart

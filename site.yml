@@ -69,3 +69,8 @@
   become: yes
   roles:
     - haproxy
+
+- hosts: backend_servers
+  become: yes
+  roles:
+    - redis
