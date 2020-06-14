@@ -1,0 +1,33 @@
+---
+- name: build artifact
+  run_once: true
+  local_action:
+    module: command
+    cmd: ./build-linux
+    chdir: '{{ src_dir }}'
+  register: build_results
+
+- set_fact:
+    app_version: '{{ build_results.stdout.split()[0] }}'
+  when: app_version is undefined or app_version == ''
+
+- name: deploy
+  vars:
+    src_bin: '{{ build_results.stdout.split()[1] }}'
+    deploy_dest_dir: '{{ deploy_dir }}/{{ app_version }}'
+
+  block:
+    - name: ensure target dirs
+      file:
+        path: '{{ item }}'
+        state: directory
+      with_items:
+        - '{{ deploy_dest_dir }}'
+        - '{{ deploy_dest_dir }}/bin'
+
+    - name: deploy artifact
+      copy:
+        src: '{{ src_dir }}/{{ src_bin }}'
+        dest: '{{ deploy_dest_dir }}/bin/{{ app_name }}'
+        mode: 0750
+      register: deploy_results

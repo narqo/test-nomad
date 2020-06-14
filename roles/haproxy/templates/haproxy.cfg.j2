@@ -1,0 +1,31 @@
+global
+	log /dev/log	local0
+	log /dev/log	local1 notice
+	chroot /var/lib/haproxy
+	stats socket /run/haproxy/admin.sock mode 660 level admin expose-fd listeners
+	stats timeout 30s
+	user haproxy
+	group haproxy
+	daemon
+
+defaults
+	log	global
+	mode	http
+	option	httplog
+	option	dontlognull
+        timeout connect 5000
+        timeout client  50000
+        timeout server  50000
+
+frontend be_server-in
+    bind *:8080
+    default_backend be_server
+
+backend be_server
+    option forwardfor header X-Adjust-Forwarded-For
+    option httpchk HEAD /internal/ping HTTP/1.0
+    # default-server inter 2000ms fastinter 500ms slowstart 10s maxconn 50000 check weight 8
+    {% for node in groups['backend_servers'] -%}
+    server {{ node }}_server_1 {{ hostvars[node].ip_address }}:8081 check weight 1
+    server {{ node }}_server_2 {{ hostvars[node].ip_address }}:8082 check weight 1
+    {% endfor %}

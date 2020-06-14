@@ -1,0 +1,15 @@
+[Unit]
+Description="consul agent"
+Documentation=https://www.consul.io/
+Requires=network-online.target
+After=network-online.target
+
+[Service]
+Restart=on-failure
+ExecStart=/usr/local/bin/consul agent --config-dir=/etc/consul.d
+ExecReload=/usr/local/bin/consul reload
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+

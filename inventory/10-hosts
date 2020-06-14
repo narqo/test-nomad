@@ -1,0 +1,47 @@
+dc-a-node-1 ansible_ssh_host=172.16.1.101 ansible_ssh_user='vagrant' 
+dc-a-node-2 ansible_ssh_host=172.16.1.102 ansible_ssh_user='vagrant' 
+dc-a-node-3 ansible_ssh_host=172.16.1.103 ansible_ssh_user='vagrant' 
+
+dc-b-node-1 ansible_ssh_host=172.16.2.101 ansible_ssh_user='vagrant' 
+dc-b-node-2 ansible_ssh_host=172.16.2.102 ansible_ssh_user='vagrant' 
+
+[dc_a]
+dc-a-node-1 ip_address=172.16.1.101
+dc-a-node-2 ip_address=172.16.1.102
+dc-a-node-3 ip_address=172.16.1.103
+
+[dc_a:vars]
+nomad_region=europe
+nomad_dc=dc-a
+
+[dc_b]
+dc-b-node-1 ip_address=172.16.2.101
+dc-b-node-2 ip_address=172.16.2.102
+
+[dc_b:vars]
+nomad_region=europe
+nomad_dc=dc-b
+
+[nomad_servers]
+dc-a-node-1
+
+[nomad_clients]
+dc-a-node-[2:3]
+dc-b-node-[1:2]
+
+[nomad_nodes:children]
+nomad_servers
+nomad_clients
+
+[lb_servers]
+dc-b-node-2
+
+[backend_servers]
+dc-a-node-1
+dc-a-node-2
+dc-b-node-1
+
+[backend_workers]
+dc-a-node-3
+dc-b-node-1
+dc-b-node-2

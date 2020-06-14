@@ -1,0 +1,71 @@
+---
+- hosts: localhost
+  connection: local
+
+  vars:
+    consul_version: '1.6.4'
+    consul_url: 'https://releases.hashicorp.com/consul/{{ consul_version }}/consul_{{ consul_version }}_linux_amd64.zip'
+    nomad_version: '0.11.3'
+    nomad_url: 'https://releases.hashicorp.com/nomad/{{ nomad_version }}/nomad_{{ nomad_version }}_linux_amd64.zip'
+
+  tasks:
+    - name: create cache dir
+      delegate_to: localhost
+      run_once: true
+      file: 
+        path: cache
+        state: directory
+
+    - name: fetch binaries
+      run_once: true
+      unarchive:
+        src: '{{ item.url }}'
+        dest: cache
+        creates: 'cache/{{ item.file }}'
+        remote_src: yes
+      loop:
+        - url: '{{ consul_url }}'
+          file: consul
+        - url: '{{ nomad_url }}'
+          file: nomad
+
+- hosts: all
+  vars:
+    backend_roles: []
+
+  tasks:
+    - name: collect backend roles
+      set_fact:
+        backend_roles: '{{ backend_roles + [item.role] }}'
+      when: 'item.group in group_names'
+      loop:
+        - group: backend_servers
+          role: be_server
+        - group: backend_workers
+          role: be_worker
+
+    - name: update nomad meta
+      set_fact:
+        nomad_meta: '{{ nomad_meta | default({}) | combine({ "backend_role": (backend_roles | join(",")) }) }}'
+
+- hosts: nomad_servers
+  become: yes
+  roles:
+    - consul
+    - role: nomad
+      vars:
+        nomad_role_server: true
+        nomad_role_client: true
+
+- hosts: nomad_clients
+  become: yes
+  roles:
+    - consul
+    - role: nomad
+      vars:
+        nomad_role_client: true
+
+- hosts: lb_servers
+  become: yes
+  roles:
+    - haproxy

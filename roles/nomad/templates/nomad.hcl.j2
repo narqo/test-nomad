@@ -1,0 +1,48 @@
+data_dir = "/var/lib/nomad"
+
+disable_update_check = true
+
+region     = "{{ nomad_region }}"
+datacenter = "{{ nomad_dc }}"
+
+{% raw %}
+advertise {
+  http = "{{ GetInterfaceIP `eth1` }}"
+  rpc  = "{{ GetInterfaceIP `eth1` }}"
+  serf = "{{ GetInterfaceIP `eth1` }}"
+}
+{% endraw %}
+
+{% if nomad_role_server %}
+server {
+  enabled = true
+
+  bootstrap_expect = 1
+  job_gc_threshold = "2m"
+  node_gc_threshold = "1h"
+}
+{% endif %}
+
+{% if nomad_role_client %}
+client {
+  enabled = true
+  servers = ["172.16.1.101:4647"]
+  //servers = {{ groups['nomad_servers'] | zip_longest([], fillvalue='4647') | map('join', ':') | list | to_json }}
+
+  network_interface = "eth1"
+
+  {% if nomad_meta %}
+  meta = {
+    {% for key, value in nomad_meta.items() %}
+    "{{ key }}" = "{{ value }}"
+    {% endfor %}
+  }
+  {% endif %}
+}
+{% endif %}
+
+plugin "raw_exec" {
+  config {
+    enabled = true
+  }
+}

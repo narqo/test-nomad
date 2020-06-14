@@ -1,0 +1,25 @@
+---
+- name: install binary
+  copy:
+    src: cache/consul
+    dest: /usr/local/bin/
+    mode: 0755
+
+- name: install service
+  copy:
+    src: consul.service
+    dest: /etc/systemd/system/
+
+- name: ensure required dirs
+  file:
+    path: '{{ item }}'
+    state: directory
+  loop:
+    - /etc/consul.d
+    - /var/lib/consul
+
+- name: ensure service
+  service:
+    name: consul
+    state: started
+    enabled: yes

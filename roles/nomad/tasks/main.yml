@@ -1,0 +1,32 @@
+---
+- name: install binary
+  copy:
+    src: cache/nomad
+    dest: /usr/local/bin/
+    mode: 0755
+
+- name: ensure required dirs
+  file:
+    path: '{{ item }}'
+    state: directory
+  loop:
+    - /etc/nomad.d
+    - /var/lib/nomad
+
+- name: install service
+  copy:
+    src: nomad.service
+    dest: /etc/systemd/system/
+
+- name: install config
+  template:
+    src: nomad.hcl.j2
+    dest: '/etc/nomad.d/{{ inventory_hostname_short }}.hcl'
+  notify:
+    - nomad restart
+
+- name: ensure service
+  service:
+    name: nomad
+    state: started
+    enabled: yes

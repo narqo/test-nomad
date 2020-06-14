@@ -1,0 +1,21 @@
+---
+- hosts: backend_servers
+  roles:
+    - role: go_app
+      vars:
+        app_name: be_server
+        src_dir: go/server
+        deploy_dir: '{{ ansible_user_dir }}/app/{{ app_name }}'
+      tags:
+        - be_server
+
+- hosts: backend_workers
+  roles:
+    - role: go_app
+      vars:
+        app_name: be_worker
+        #app_version: latest
+        src_dir: go/worker
+        deploy_dir: '{{ ansible_user_dir }}/app/{{ app_name }}'
+      tags:
+        - be_worker

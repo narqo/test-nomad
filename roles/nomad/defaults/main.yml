@@ -1,0 +1,6 @@
+---
+
+nomad_meta: {}
+
+nomad_role_server: false
+nomad_role_client: false
