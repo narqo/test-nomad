@@ -53,7 +53,7 @@ func run(ctx context.Context, args []string) error {
 	)
 	flags.StringVar(&addr, "http.addr", "127.0.0.1:8080", "address to listen on")
 	flags.StringVar(&redisConnURL, "redis.conn-url", "tcp://127.0.0.1:6379", "redis connection url")
-	flags.StringVar(&redisDB, "redis.db", "127.0.0.1:6379", "redis connection address")
+	flags.StringVar(&redisDB, "redis.db", "1", "redis database")
 
 	if err := flags.Parse(args); err != nil {
 		return err
