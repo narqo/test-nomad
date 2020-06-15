@@ -54,7 +54,7 @@ func run(ctx context.Context, args []string) error {
 		os.Exit(1)
 	}
 
-	log.Println("starting...")
+	log.Printf("starting: version %s", versionString())
 
 	return runWorker(ctx, workerPollInterval)
 }

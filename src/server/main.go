@@ -78,7 +78,7 @@ func run(ctx context.Context, args []string) error {
 
 	errc := make(chan error, 1)
 	go func() {
-		log.Printf("starting: addr=%s, version=%s", addr, versionString())
+		log.Printf("starting: addr %s, version %s", addr, versionString())
 		errc <- server.ListenAndServe()
 	}()
 
