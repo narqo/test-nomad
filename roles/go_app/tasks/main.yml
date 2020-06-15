@@ -7,12 +7,9 @@
     chdir: '{{ src_dir }}'
   register: build_results
 
-- set_fact:
-    app_version: '{{ build_results.stdout.split()[0] }}'
-  when: app_version is undefined or app_version == ''
-
 - name: deploy
   vars:
+    app_version: '{{ build_results.stdout.split()[0] }}'
     src_bin: '{{ build_results.stdout.split()[1] }}'
     deploy_dest_dir: '{{ deploy_dir }}/{{ app_version }}'
 
