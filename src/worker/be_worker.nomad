@@ -11,6 +11,11 @@ job "be_worker" {
         value     = "be_worker"
     }
 
+    update {
+        max_parallel = 1
+        stagger = "10s"
+    }
+
     meta = {
         version = "latest"
     }
