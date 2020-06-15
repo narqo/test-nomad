@@ -12,11 +12,8 @@ job "be_server" {
     }
 
     update {
-        auto_promote = false
-        canary = 1
         max_parallel = 1
-        health_check = "task_states"
-        min_healthy_time = "5s"
+        stagger = "10s"
     }
 
     meta = {

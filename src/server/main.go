@@ -46,8 +46,14 @@ func run(ctx context.Context, args []string) error {
 
 	printVersion := flags.Bool("version", false, "print version and exit")
 
-	var addr string
+	var (
+		addr         string
+		redisConnURL string
+		redisDB      string
+	)
 	flags.StringVar(&addr, "http.addr", "127.0.0.1:8080", "address to listen on")
+	flags.StringVar(&redisConnURL, "redis.conn-url", "tcp://127.0.0.1:6379", "redis connection url")
+	flags.StringVar(&redisDB, "redis.db", "127.0.0.1:6379", "redis connection address")
 
 	if err := flags.Parse(args); err != nil {
 		return err
